@@ -1,45 +1,99 @@
-import type { MetadataRoute } from 'next'
+import { MetadataRoute } from 'next'
+import fs from 'fs'
+import path from 'path'
 
-import { getAllPosts } from '@/lib/blog'
-import { getAllServiceLocationCombos } from '@/lib/services-data'
+const baseUrl = 'https://www.buildinghealthx.com'
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  process.env.SITE_URL ||
-  // Fallback for preview / first deploy. Set NEXT_PUBLIC_SITE_URL in production.
-  'https://vimnyc15.vercel.app'
+const services = [
+  'moving-companies',
+  'tenant-lawyers',
+  'renters-insurance',
+  'pest-control',
+  'storage-facilities',
+  'building-inspectors',
+]
+
+const locations = [
+  'upper-east-side',
+  'upper-west-side',
+  'harlem',
+  'east-village',
+  'west-village',
+  'chelsea',
+  'tribeca',
+  'hells-kitchen',
+  'williamsburg',
+  'bushwick',
+  'bedford-stuyvesant',
+  'park-slope',
+  'downtown-brooklyn',
+  'dumbo',
+  'crown-heights',
+  'greenpoint',
+  'astoria',
+  'long-island-city',
+  'flushing',
+  'jackson-heights',
+  'ridgewood',
+  'sunnyside',
+  'fordham',
+  'kingsbridge',
+  'riverdale',
+  'mott-haven',
+  'pelham-bay',
+  'st-george',
+  'stapleton',
+]
+
+function getBlogSlugs(): string[] {
+  try {
+    const blogDir = path.join(process.cwd(), 'content', 'blog')
+    const folders = fs.readdirSync(blogDir, { withFileTypes: true })
+    return folders
+      .filter((dirent) => dirent.isDirectory())
+      .map((dirent) => dirent.name)
+  } catch {
+    return []
+  }
+}
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date()
 
-  const base: MetadataRoute.Sitemap = [
+  // Homepage
+  const staticPages: MetadataRoute.Sitemap = [
     {
-      url: `${siteUrl}/`,
+      url: baseUrl,
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 1,
     },
     {
-      url: `${siteUrl}/blog`,
+      url: `${baseUrl}/blog`,
       lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.7,
+      changeFrequency: 'daily',
+      priority: 0.9,
     },
   ]
 
-  const blogEntries: MetadataRoute.Sitemap = getAllPosts().map((p) => ({
-    url: `${siteUrl}/blog/${p.slug}`,
+  // Service landing pages (174 total)
+  const servicePages: MetadataRoute.Sitemap = services.flatMap((service) =>
+    locations.map((location) => ({
+      url: `${baseUrl}/services/${service}/${location}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    }))
+  )
+
+  // Blog posts
+  const blogSlugs = getBlogSlugs()
+  const blogPages: MetadataRoute.Sitemap = blogSlugs.map((slug) => ({
+    url: `${baseUrl}/blog/${slug}`,
     lastModified: now,
-    changeFrequency: 'monthly',
-    priority: 0.6,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
   }))
 
-  const serviceEntries: MetadataRoute.Sitemap = getAllServiceLocationCombos().map(({ service, location }) => ({
-    url: `${siteUrl}/services/${service.slug}/${location.slug}`,
-    lastModified: now,
-    changeFrequency: 'monthly',
-    priority: 0.65,
-  }))
-
-  return [...base, ...serviceEntries, ...blogEntries]
+  return [...staticPages, ...servicePages, ...blogPages]
 }
