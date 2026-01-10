@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { Building2, Clock } from 'lucide-react'
+import { Building2 } from 'lucide-react'
 import Parser from 'rss-parser'
 
 export const metadata: Metadata = {
@@ -156,7 +156,7 @@ export default async function NewsPage() {
                   {truncateToSentences(item.contentSnippet || item.content || '', 3)}
                 </p>
                 
-                
+                <a
                   href={item.link}
                   target="_blank"
                   rel="noopener noreferrer"
