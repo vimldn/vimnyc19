@@ -189,11 +189,22 @@ export default function HomePage() {
               <Clock size={14} />
               <span>30 / 90 days • 1 / 3 years</span>
             </div>
+            <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-2 text-sm text-[#64748b]">
+              <Clock size={14} />
+              <span>30 / 90 days • 1 / 3 years</span>
+            </div>
             <Link
               href="/blog"
               className="px-3 py-1.5 rounded-lg border border-[#1e293b] text-sm text-[#cbd5e1] hover:bg-white/5 transition"
             >
               Blog
+            </Link>
+            <Link
+              href="/news"
+              className="px-3 py-1.5 rounded-lg border border-[#1e293b] text-sm text-[#cbd5e1] hover:bg-white/5 transition"
+            >
+              News
             </Link>
           </div>
         </div>
